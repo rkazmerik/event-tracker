@@ -1,13 +1,13 @@
 import boto3
 import json
 import random
-import time
-from datetime import datetime
+from datetime import datetime, timezone
 from faker import Faker
 
 # --- Configuration ---
 firehose_stream_name = 'event-delivery-stream'
 region_name = 'us-east-2'
+batch_size = 10  # How many events to send in one batch
 
 # --- Initialize Clients ---
 firehose = boto3.client('firehose', region_name=region_name)
@@ -19,27 +19,31 @@ devices = ["desktop", "mobile", "tablet"]
 
 # --- Fake Event Generator ---
 def generate_fake_event():
-    event = {
+    return {
         "user_id": faker.uuid4(),
-        "event_timestamp": datetime.utcnow().isoformat() + "Z",
+        "event_timestamp": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
         "page": random.choice(pages),
         "device": random.choice(devices),
         "browser": faker.user_agent(),
         "ip_address": faker.ipv4_public()
     }
-    return event
 
-# --- Main Send Loop ---
-for _ in range(10):  # Send 10 events
+# --- Create a Batch of Records ---
+records = []
+
+for _ in range(batch_size):
     event = generate_fake_event()
-    print(f"Sending event: {event}")
+    print(f"Generated event: {event}")
+    
+    # Each record must end with a newline '\n'
+    records.append({
+        'Data': json.dumps(event) + "\n"
+    })
 
-    response = firehose.put_record(
-        DeliveryStreamName=firehose_stream_name,
-        Record={
-            'Data': json.dumps(event) + "\n"
-        }
-    )
+# --- Send the batch to Firehose ---
+response = firehose.put_record_batch(
+    DeliveryStreamName=firehose_stream_name,
+    Records=records
+)
 
-    print(f"Response: {response['RecordId']}")
-    time.sleep(1)
+print(f"Batch response: {response}")
