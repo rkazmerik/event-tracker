@@ -179,9 +179,10 @@ resource "aws_lambda_function" "transform_function" {
   filename         = "./lambda/transform_payload.zip"
   function_name    = "firehose_transform_function"
   role             = aws_iam_role.lambda_role.arn
-  handler          = "transform_payload.lambda_handler"  # Make sure the filename and function name match
+  handler          = "transform_payload.lambda_handler"
   runtime          = "python3.12"
   source_code_hash = filebase64sha256("./lambda/transform_payload.zip")
+  timeout       = 60
 }
 
 # --- KINESIS RESOURCES ---
