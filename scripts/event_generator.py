@@ -14,15 +14,17 @@ faker = Faker()
 
 def generate_event():
 
+    event_time = faker.date_time_between(start_date='-1y', end_date='now', tzinfo=timezone.utc)
+    
     return {
         'browser': random.choice(['Chrome', 'Firefox', 'Safari', 'Edge']),
         'device': random.choice(['Desktop', 'Mobile', 'Tablet']),
         'event_id': faker.uuid4(),
+        'event_date': event_time.strftime('%Y-%m-%d'),
         'event_type': random.choice(['click', 'view', 'purchase', 'login']),
-        'event_timestamp': faker.date_time_between(start_date='-1y', end_date='now', tzinfo=timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
+        'event_timestamp': event_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
         'ip_address': faker.ipv4(),
         'page': faker.uri_path(),
-        'server_ingestion_time': datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
         'user_id': faker.uuid4()
     }
 

@@ -193,12 +193,16 @@ resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
   extended_s3_configuration {
     bucket_arn          = aws_s3_bucket.event_data_bucket.arn
     role_arn            = aws_iam_role.firehose_role.arn
-    prefix              = "events/"
+    prefix              = "events/event_date=!{partitionKeyFromLambda:event_date}/"
 
-    buffering_size      = 1
-    buffering_interval  = 30
+    buffering_size      = 64
+    buffering_interval  = 60
     compression_format  = "GZIP"
     error_output_prefix = "errors/!{firehose:error-output-type}/"
+
+    dynamic_partitioning_configuration {
+      enabled = true
+    }
 
     processing_configuration {
       enabled = true
@@ -289,8 +293,12 @@ resource "aws_glue_catalog_table" "events_table" {
       name = "user_id"
       type = "string"
     }
-
   }
+
+  partition_keys {
+    name = "event_date"
+    type = "string"
+    }
 }
 
 # --- ATHENA RESOURCES ---
