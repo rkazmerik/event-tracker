@@ -68,6 +68,11 @@ resource "aws_iam_policy" "firehose_policy" {
           "lambda:GetFunctionConfiguration"
         ],
         Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = ["firehose:EvaluateExpression"],
+        Resource = "${aws_kinesis_firehose_delivery_stream.event_stream.arn}"
       }
     ]
   })
@@ -194,7 +199,6 @@ resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
     bucket_arn          = aws_s3_bucket.event_data_bucket.arn
     role_arn            = aws_iam_role.firehose_role.arn
     prefix              = "events/event_date=!{partitionKeyFromLambda:event_date}/"
-
     buffering_size      = 64
     buffering_interval  = 60
     compression_format  = "GZIP"
@@ -209,8 +213,7 @@ resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
 
       processors {
         type = "Lambda"
-
-        parameters {
+          parameters {
           parameter_name  = "LambdaArn"
           parameter_value = aws_lambda_function.transform_function.arn
         }
@@ -229,14 +232,7 @@ resource "aws_glue_catalog_database" "events_db" {
 resource "aws_glue_catalog_table" "events_table" {
   name          = "events"
   database_name = aws_glue_catalog_database.events_db.name
-
   table_type = "EXTERNAL_TABLE"
-
-  parameters = {
-    "classification"  = "json"
-    "compressionType"  = "gzip"
-    "typeOfData"       = "file"
-  }
 
   storage_descriptor {
     location      = "s3://${aws_s3_bucket.event_data_bucket.bucket}/events/"
@@ -247,6 +243,9 @@ resource "aws_glue_catalog_table" "events_table" {
     ser_de_info {
       name                  = "json"
       serialization_library = "org.openx.data.jsonserde.JsonSerDe"
+      parameters = { 
+        "serialization.format" = "1" 
+      }
     }
 
     columns {
@@ -298,7 +297,20 @@ resource "aws_glue_catalog_table" "events_table" {
   partition_keys {
     name = "event_date"
     type = "string"
-    }
+  }
+
+  parameters = {
+    "classification" = "json"
+    "compressionType" = "gzip"
+    "typeOfData" = "file"
+    "projection.enabled" = "true"
+    "projection.event_date.type" = "date"
+    "projection.event_date.format" = "yyyy-MM-dd"
+    "projection.event_date.range"  = "2024-01-01,NOW"
+    "projection.event_date.interval" = "1"
+    "projection.event_date.interval.unit" = "DAYS"
+    "storage.location.template" = "s3://${aws_s3_bucket.event_data_bucket.bucket}/events/event_date=$${event_date}/"
+  }
 }
 
 # --- ATHENA RESOURCES ---
