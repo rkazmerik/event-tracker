@@ -1,14 +1,3 @@
-resource "aws_cloudwatch_log_group" "firehose_log_group" {
-  name              = "/aws/kinesisfirehose/${local.project_name}-stream"
-  retention_in_days = 90 
-  tags              = local.common_tags
-}
-
-resource "aws_cloudwatch_log_stream" "firehose_error_stream" {
-  name           = "DeliveryStreamErrorLogs"
-  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
-}
-
 resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
   name        = "${local.project_name}-stream"
   destination = "extended_s3"
@@ -16,15 +5,11 @@ resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
   extended_s3_configuration {
     bucket_arn          = aws_s3_bucket.event_data_bucket.arn
     role_arn            = aws_iam_role.firehose_role.arn
-    prefix              = "events/event_date=!{partitionKeyFromLambda:event_date}/"
+    prefix              = "events/"
     buffering_size      = 64
-    buffering_interval  = 60
+    buffering_interval  = 10
     compression_format  = "GZIP"
     error_output_prefix = "errors/!{firehose:error-output-type}/"
-
-    dynamic_partitioning_configuration {
-      enabled = true
-    }
 
     processing_configuration {
       enabled = true
@@ -36,19 +21,9 @@ resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
         }
       }
     }
-
-    cloudwatch_logging_options {
-      enabled         = true
-      log_group_name  = aws_cloudwatch_log_group.firehose_log_group.name
-      log_stream_name = aws_cloudwatch_log_stream.firehose_error_stream.name
-    }
   }
 
-  depends_on = [
-    aws_lambda_function.transform_function, 
-    aws_cloudwatch_log_group.firehose_log_group,
-    aws_cloudwatch_log_stream.firehose_error_stream
-  ]
+  depends_on = [aws_lambda_function.transform_function]
 
   tags = local.common_tags
 }

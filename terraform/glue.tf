@@ -8,6 +8,12 @@ resource "aws_glue_catalog_table" "events_table" {
   database_name = aws_glue_catalog_database.events_db.name
   table_type    = "EXTERNAL_TABLE"
 
+  parameters = {
+    "classification" = "json"
+    "compressionType" = "gzip"
+    "typeOfData" = "file"
+  }
+
   storage_descriptor {
     location      = "s3://${aws_s3_bucket.event_data_bucket.bucket}/events/"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
@@ -56,23 +62,5 @@ resource "aws_glue_catalog_table" "events_table" {
       name = "user_id"
       type = "string"
     }
-  }
-
-  partition_keys {
-    name = "event_date"
-    type = "string"
-  }
-
-  parameters = {
-    "classification" = "json"
-    "compressionType" = "gzip"
-    "typeOfData" = "file"
-    "projection.enabled" = "true"
-    "projection.event_date.type" = "date"
-    "projection.event_date.format" = "yyyy-MM-dd"
-    "projection.event_date.range" = "2024-01-01,NOW"
-    "projection.event_date.interval" = "1"
-    "projection.event_date.interval.unit" = "DAYS"
-    "storage.location.template" = "s3://${aws_s3_bucket.event_data_bucket.bucket}/events/event_date=$${event_date}/"
   }
 }

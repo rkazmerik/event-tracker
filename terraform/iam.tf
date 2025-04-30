@@ -38,21 +38,6 @@ resource "aws_iam_policy" "firehose_policy" {
           "lambda:GetFunctionConfiguration"
         ],
         Resource = aws_lambda_function.transform_function.arn
-      },
-      {
-        Effect = "Allow",
-        Action = ["firehose:EvaluateExpression"],
-        Resource = aws_kinesis_firehose_delivery_stream.event_stream.arn
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:DescribeLogStreams",
-          "logs:PutLogEvents"
-        ],
-        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/kinesisfirehose/${local.project_name}-stream:*"
       }
     ]
   })
