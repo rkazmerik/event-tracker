@@ -20,7 +20,7 @@ def lambda_handler(event, context):
             # Encode transformed data back to base64 with newline added
             transformed_payload = json.dumps(data) + "\n"
             encoded_data = base64.b64encode(transformed_payload.encode('utf-8')).decode('utf-8')
-            
+
             output.append({
                 'recordId': record['recordId'],
                 'result': 'Ok',

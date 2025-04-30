@@ -4,6 +4,11 @@ resource "aws_cloudwatch_log_group" "firehose_log_group" {
   tags              = local.common_tags
 }
 
+resource "aws_cloudwatch_log_stream" "firehose_error_stream" {
+  name           = "DeliveryStreamErrorLogs"
+  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
+}
+
 resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
   name        = "${local.project_name}-stream"
   destination = "extended_s3"
@@ -35,10 +40,15 @@ resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
     cloudwatch_logging_options {
       enabled         = true
       log_group_name  = aws_cloudwatch_log_group.firehose_log_group.name
-      log_stream_name = "DeliveryStreamLogs"
+      log_stream_name = aws_cloudwatch_log_stream.firehose_error_stream.name
     }
   }
 
-  depends_on = [aws_lambda_function.transform_function, aws_cloudwatch_log_group.firehose_log_group]
+  depends_on = [
+    aws_lambda_function.transform_function, 
+    aws_cloudwatch_log_group.firehose_log_group,
+    aws_cloudwatch_log_stream.firehose_error_stream
+  ]
+
   tags = local.common_tags
 }
