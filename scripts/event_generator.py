@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import random
 
 # --- Configuration ---
-firehose_stream_name = 'event-delivery-stream'
+firehose_stream_name = 'event-tracking-pipeline-stream'
 region_name = 'us-east-2'
 
 # --- Initialize Clients ---
@@ -51,7 +51,7 @@ def submit_event_to_firehose(event):
 
 def main():
 
-    num_events = 1000
+    num_events = 100
     for i in range(num_events):
         event = generate_event()
         submit_event_to_firehose(event)
