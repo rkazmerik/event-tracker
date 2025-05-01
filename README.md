@@ -84,8 +84,15 @@ The `v1` version, available on the `main` branch, introduced significant enhance
    git clone <repository-url>
    cd <repository-directory>
    ```
+2. **Package Lambda Function**:
+   - Zip the Lambda code:
+     ```bash
+     cd lambda
+     zip -r transform_payload.zip transform_payload.py
+     ```
+   - Ensure the zip file is referenced in `lambda.tf`.
 
-2. **Deploy Infrastructure with Terraform**:
+3. **Deploy Infrastructure with Terraform**:
    - Initialize Terraform:
      ```bash
      cd terraform
@@ -97,32 +104,17 @@ The `v1` version, available on the `main` branch, introduced significant enhance
      ```
      This creates S3 buckets, Firehose stream, Lambda function, Glue catalog, Athena workgroup, and IAM roles.
 
-3. **Package Lambda Function**:
-   - Zip the Lambda code:
-     ```bash
-     cd lambda
-     zip -r transform_payload.zip transform_payload.py
-     ```
-   - Ensure the zip file is referenced in `lambda.tf`.
-
 4. **Generate Sample Events**:
    - Run the event generator script:
      ```bash
+     cd scripts
      python event_generator.py
      ```
      This sends 100,000 sample events to the Firehose stream.
 
 5. **Run Athena Queries with `event_analysis.ipynb`**:
-   - Install Jupyter and dependencies:
-     ```bash
-     pip install jupyter
-     ```
-   - Open `event_analysis.ipynb` in a Jupyter environment:
-     ```bash
-     jupyter notebook
-     ```
    - Update `DATABASE` (`events_db`) and `S3_BUCKET` (Athena query results bucket) variables if needed.
-   - Execute the notebook cells to run Athena queries using the `awswrangler` package.
+   - Execute the notebook cells to run Athena queries.
 
 ## Usage 🎯
 - **Generating Events**: Use `event_generator.py` to simulate user events. Modify `num_events`, `browsers`, `devices`, `event_types`, `pages`, or `user_ids` for custom scenarios.
