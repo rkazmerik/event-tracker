@@ -1,14 +1,3 @@
-resource "aws_cloudwatch_log_group" "firehose_log_group" {
-  name              = "/aws/kinesisfirehose/${local.project_name}-stream"
-  retention_in_days = 90 
-  tags              = local.common_tags
-}
-
-resource "aws_cloudwatch_log_stream" "firehose_error_stream" {
-  name           = "DeliveryStreamErrorLogs"
-  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
-}
-
 resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
   name        = "${local.project_name}-stream"
   destination = "extended_s3"
@@ -52,3 +41,15 @@ resource "aws_kinesis_firehose_delivery_stream" "event_stream" {
 
   tags = local.common_tags
 }
+
+resource "aws_cloudwatch_log_group" "firehose_log_group" {
+  name              = "/aws/kinesisfirehose/${local.project_name}-stream"
+  retention_in_days = 90 
+  tags              = local.common_tags
+}
+
+resource "aws_cloudwatch_log_stream" "firehose_error_stream" {
+  name           = "DeliveryStreamErrorLogs"
+  log_group_name = aws_cloudwatch_log_group.firehose_log_group.name
+}
+

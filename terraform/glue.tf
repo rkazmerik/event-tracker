@@ -70,7 +70,7 @@ resource "aws_glue_catalog_table" "events_table" {
     "projection.enabled" = "true"
     "projection.event_date.type" = "date"
     "projection.event_date.format" = "yyyy-MM-dd"
-    "projection.event_date.range" = "2024-01-01,NOW"
+    "projection.event_date.range" = "2024-06-01,NOW"
     "projection.event_date.interval" = "1"
     "projection.event_date.interval.unit" = "DAYS"
     "storage.location.template" = "s3://${aws_s3_bucket.event_data_bucket.bucket}/events/event_date=$${event_date}/"
