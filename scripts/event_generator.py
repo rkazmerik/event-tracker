@@ -51,7 +51,7 @@ def submit_event_to_firehose(event):
 
 def main():
 
-    num_events = 100
+    num_events = 100000
     for i in range(num_events):
         event = generate_event()
         submit_event_to_firehose(event)

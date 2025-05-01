@@ -8,3 +8,9 @@ resource "aws_lambda_function" "transform_function" {
   timeout          = 60
   tags             = local.common_tags
 }
+
+resource "aws_cloudwatch_log_group" "lambda_log_group" {
+  name              = "/aws/lambda/${aws_lambda_function.transform_function.function_name}"
+  retention_in_days = 90
+  tags              = local.common_tags
+}
