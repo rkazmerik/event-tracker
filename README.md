@@ -98,6 +98,10 @@ The `v1` version, available on the `main` branch, introduced significant enhance
      cd terraform
      terraform init
      ```
+   - Always check your terraform plan before applying:
+     ```bash
+     terraform plan
+     ```
    - Apply the configuration (ensure AWS credentials are set):
      ```bash
      terraform apply
@@ -119,26 +123,18 @@ The `v1` version, available on the `main` branch, introduced significant enhance
 ## Usage 🎯
 - **Generating Events**: Use `event_generator.py` to simulate user events. Modify `num_events`, `browsers`, `devices`, `event_types`, `pages`, or `user_ids` for custom scenarios.
 - **Querying Data with `event_analysis.ipynb`**: The notebook uses `awswrangler` to query Athena, providing insights into user behavior. Example queries include:
-  - Top active users by event count.
-  - User event flows in a 60-day window.
-  - Pages driving purchases.
-  - Users losing interest (churn risk).
-  - Platform engagement by device.
-  - Failed login attempts.
+  - **Events by User**: Identifies the top 10 most active users by event count.
+  - **User Event Flow**: Analyzes the top user's activities (e.g., page visits, event types) in the past 60 days.
+  - **Purchase Drivers**: Tracks pages visited before purchases to understand conversion paths.
+  - **User Drop-off**: Identifies the last page user was on before ending their session.
+  - **Churning Users**: Detects users with declining activity for retention outreach.
+  - **Platform Engagement**: Compares average events per month across devices (Desktop, Mobile, Tablet).
+  - **Login Issues**: Identifies users with frequent failed login attempts for support intervention.
 
 ## Security 🔒
 - **IAM Policies**: Follow least-privilege principles, granting only necessary permissions to Firehose, Lambda, and Glue.
 - **S3 Buckets**: Configured with unique names and `force_destroy` for testing. Update for production to secure data.
 - **Logging**: 90-day retention for CloudWatch logs ensures auditability without excessive storage costs.
-
-## Example Queries in `event_analysis.ipynb` 📊
-The `event_analysis.ipynb` notebook uses `awswrangler` to execute SQL queries on Athena, including:
-- **Events by User**: Identifies the top 10 most active users by event count.
-- **User Event Flow**: Analyzes the top user's activities (e.g., page visits, event types) in the past 60 days.
-- **Purchase Drivers**: Tracks pages visited before purchases to understand conversion paths.
-- **Churning Users**: Detects users with declining activity for retention outreach.
-- **Platform Engagement**: Compares average events per month across devices (Desktop, Mobile, Tablet).
-- **Login Issues**: Identifies users with frequent failed login attempts for support intervention.
 
 ## Troubleshooting 🐞
 - **Firehose Errors**: Check CloudWatch log group for delivery failures or S3 destination errors.
@@ -152,4 +148,4 @@ The `event_analysis.ipynb` notebook uses `awswrangler` to execute SQL queries on
 - Consider modelling data into logical units (i.e. users, activities) to further support analytics queries.
 
 ## Contact 📧
-For questions or contributions, contact [Your Name] at [Your Email].
+For questions or contributions, contact Ryan Kazmerik at rkazmerik@gmail.com
