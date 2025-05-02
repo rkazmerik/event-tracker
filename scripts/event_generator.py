@@ -15,8 +15,8 @@ faker = Faker()
 # --- Initialize Variables ---
 browsers = ['Chrome', 'Firefox', 'Safari', 'Edge']
 devices = ['Desktop', 'Mobile', 'Tablet']
-event_types = ['click', 'view', 'purchase', 'sign-up', 'search', 'error']
-pages = ['account','articles','login','promotions','pricing','products','sizzle','settings']
+event_types = ['click', 'view', 'search', 'submit', 'error']
+pages = ['articles','demo','login','promotions','pricing','purchase','sizzle','tutorials']
 user_ids = [faker.unique.random_int(min=100000, max=999999) for _ in range(100)]
 
 def generate_event():

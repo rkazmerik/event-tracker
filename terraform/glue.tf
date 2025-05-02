@@ -66,6 +66,10 @@ resource "aws_glue_catalog_table" "events_table" {
       type = "timestamp"
     }
     columns {
+      name = "session_id"
+      type = "string"
+    }
+    columns {
       name = "user_id"
       type = "string"
     }

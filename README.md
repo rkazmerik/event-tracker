@@ -75,7 +75,7 @@ The `v1` version, available on the `main` branch, introduced significant enhance
 - **AWS CLI**: Configured with credentials.
 - **Dependencies**: Install Python packages for `event_generator.py` and `event_analysis.ipynb`:
   ```bash
-  pip install boto3 faker awswrangler pandas
+  pip install boto3 faker awswrangler pandas streamlit plotly-express
   ```
 
 ## Setup Instructions 🛠️
